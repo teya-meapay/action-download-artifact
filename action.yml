@@ -1,12 +1,30 @@
-name: 'Container Action Template'
-description: 'Get started with Container actions'
-author: 'GitHub'
-inputs: 
-  myInput:
-    description: 'Input to use'
-    default: 'world'
+name: Download workflow artifact
+description: Download and extract the latest artifact from a workflow
+author: MeaWallet
+branding:
+  icon: download
+  color: orange
+inputs:
+  github_token:
+    description: GitHub token
+    required: false
+    default: ${{github.token}}
+  repo:
+    description: Repository name with owner (like meallet/meapay-pin-sdk)
+    required: true
+  workflow:
+    description: Workflow name
+    required: true
+  workflow_id:
+    description: Workflow name
+    required: false
+  path:
+    description: Where to unpack the artifact
+    required: false
+    default: "./"
+outputs:
+  error_message:
+    description: The error message, if an error occurs
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.myInput }}
+  using: node16
+  main: main.js
