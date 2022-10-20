@@ -18,18 +18,15 @@ async function main() {
         const client = github.getOctokit(token)
 
         console.log("==> Workflow:", workflow)
-
         console.log("==> Repo:", owner + "/" + repo)
 
-
-        for await (const runs of client.paginate.iterator(client.actions.listWorkflowRuns, {
+        for await (const runs of client.paginate.iterator(client.rest.actions.listWorkflowRuns, {
             owner: owner,
             repo: repo,
             workflow_id: workflow,
             per_page: 1,
             page: 1
-        }
-        )) {
+        })) {
             console.log("==> Number of runs for workflow:", runs.length)
             
             for (const run of runs.data) {
@@ -44,12 +41,11 @@ async function main() {
         
         console.log("==> Latest Run id:", runID)
         
-        let artifacts = await client.paginate(client.actions.listWorkflowRunArtifacts, {
+        let artifacts = await client.paginate(client.rest.actions.listWorkflowRunArtifacts, {
             owner: owner,
             repo: repo,
             run_id: runID,
         })
-
 
         if (artifacts.length == 0)
             throw new Error("no artifacts found")
