@@ -11,6 +11,7 @@ async function main() {
         const workflow = core.getInput("workflow", { required: true })
         const [owner, repo] = core.getInput("repo", { required: true }).split("/")
         const name = core.getInput("name")
+        const branch = core.getInput("branch")
         const path = core.getInput("path", { required: true })
             
         // let latestRun
@@ -21,14 +22,17 @@ async function main() {
         console.log("==> Workflow:", workflow)
         console.log("==> Artifact name:", name)
         console.log("==> Repo:", owner + "/" + repo)
-
+        console.log("==> Branch:", branch)
+        
         for await (const runs of client.paginate.iterator(client.rest.actions.listWorkflowRuns, {
             owner: owner,
             repo: repo,
             workflow_id: workflow,
+            branch: branch,
             per_page: 1,
             page: 1
         })) {
+            console.log("==> Info of workflow runs:", runs)
             console.log("==> Number of runs for workflow:", runs.length)
             
             for (const run of runs.data) {
