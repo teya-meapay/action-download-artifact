@@ -10,6 +10,7 @@ async function main() {
         const token = core.getInput("github_token", { required: true })
         const workflow = core.getInput("workflow", { required: true })
         const [owner, repo] = core.getInput("repo", { required: true }).split("/")
+        const name = core.getInput("name")
         const path = core.getInput("path", { required: true })
             
         // let latestRun
@@ -18,6 +19,7 @@ async function main() {
         const client = github.getOctokit(token)
 
         console.log("==> Workflow:", workflow)
+        console.log("==> Artifact name:", name)
         console.log("==> Repo:", owner + "/" + repo)
 
         for await (const runs of client.paginate.iterator(client.rest.actions.listWorkflowRuns, {
@@ -50,6 +52,25 @@ async function main() {
         if (artifacts.length == 0)
             throw new Error("no artifacts found")
 
+        // One artifact or all if `name` input is not specified.
+        if (name) {
+            filtered = artifacts.filter((artifact) => {
+                return artifact.name == name
+            })
+            
+            if (filtered.length == 0) {
+                console.log("==> (not found) Artifact:", name)
+                console.log("==> Found the following artifacts instead:")
+                
+                for (const artifact of artifacts) {
+                    console.log("\t==> (found) Artifact:", artifact.name)
+                }
+            }
+            artifacts = filtered
+        }
+
+        core.setOutput("artifacts", artifacts)
+
         for (const artifact of artifacts) {
             console.log("==> Artifact id:", artifact.id)
             console.log("==> Artifact name:", artifact.name)
@@ -64,7 +85,6 @@ async function main() {
                 artifact_id: artifact.id,
                 archive_format: "zip",
             })
-
 
             const dir = pathname.join(path, artifact.name)
 

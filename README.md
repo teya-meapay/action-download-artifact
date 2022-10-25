@@ -21,6 +21,8 @@ Let's suppose you have a workflow with a job in it that at the end uploads an ar
     repo: owner/repository
     # Required, workflow file name or ID
     workflow: workflow_name.yml
+    # Optional, uploaded artifact name. If not specified, action will download all attached artifacts
+    name: my-artifact
     # Optional, directory where to extract artifact(s), defaults to current directory
     path: extract_here
 ```
